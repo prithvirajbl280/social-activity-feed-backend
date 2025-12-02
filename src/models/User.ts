@@ -1,0 +1,44 @@
+import mongoose, { Schema, Document } from 'mongoose';
+import bcrypt from 'bcryptjs';
+
+export interface IUser extends Document {
+    username: string;
+    email: string;
+    password: string;
+    role: 'user' | 'admin' | 'owner';
+    following: mongoose.Types.ObjectId[];
+    followers: mongoose.Types.ObjectId[];
+    blockedUsers: mongoose.Types.ObjectId[];
+    matchPassword: (enteredPassword: string) => Promise<boolean>;
+}
+
+const UserSchema: Schema = new Schema(
+    {
+        username: { type: String, required: true, unique: true },
+        email: { type: String, required: true, unique: true },
+        password: { type: String, required: true },
+        role: {
+            type: String,
+            enum: ['user', 'admin', 'owner'],
+            default: 'user',
+        },
+        following: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+        followers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+        blockedUsers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+    },
+    { timestamps: true }
+);
+
+UserSchema.pre<IUser>('save', async function (next) {
+    if (!this.isModified('password')) {
+        next();
+    }
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+});
+
+UserSchema.methods.matchPassword = async function (enteredPassword: string) {
+    return await bcrypt.compare(enteredPassword, this.password);
+};
+
+export default mongoose.model<IUser>('User', UserSchema);
