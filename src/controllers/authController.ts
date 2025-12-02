@@ -32,7 +32,7 @@ export const registerUser = async (req: Request, res: Response) => {
             username: user.username,
             email: user.email,
             role: user.role,
-            token: generateToken(user._id as string),
+            token: generateToken(user._id.toString()),
         });
     } else {
         res.status(400).json({ message: 'Invalid user data' });
@@ -53,9 +53,43 @@ export const loginUser = async (req: Request, res: Response) => {
             username: user.username,
             email: user.email,
             role: user.role,
-            token: generateToken(user._id as string),
+            token: generateToken(user._id.toString()),
         });
     } else {
         res.status(401).json({ message: 'Invalid email or password' });
     }
 };
+```
+
+### Steps to Fix on GitHub:
+
+1. Go to: `https://github.com/YOUR_USERNAME/social-activity-feed-backend/blob/main/src/controllers/authController.ts`
+2. Click the **pencil icon** (Edit this file)
+3. Find line 35: Change `user._id as string` to `user._id.toString()`
+4. Find line 56: Change `user._id as string` to `user._id.toString()`
+5. Scroll down and commit: `"Fix: TypeScript ObjectId to string conversion"`
+
+### Railway Will Auto-Deploy
+
+Once you commit, Railway will automatically:
+- Detect the change
+- Build again
+- This time it should succeed! ✅
+
+## Expected Success Log
+
+After the fix, you should see:
+```
+npm run build
+> npx tsc
+
+✓ Build successful
+```
+
+Then it will start your server:
+```
+npm run start
+> node dist/server.js
+
+MongoDB Connected: cluster0.xxxxx.mongodb.net
+Server running on port 5000
