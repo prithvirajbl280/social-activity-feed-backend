@@ -363,7 +363,7 @@
     "variable": [
         {
             "key": "base_url",
-            "value": "http://localhost:5000",
+            "value": "social-activity-feed-backend-production.up.railway.app",
             "type": "string"
         },
         {
@@ -388,3 +388,4 @@
         }
     ]
 }
+
