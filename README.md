@@ -6,9 +6,9 @@ A comprehensive social media activity feed backend API built with Node.js, Expre
 
 **API URL:** https://social-activity-feed-backend-production.up.railway.app
 
-**Status:** ✅ Live and Running
+**Status:**Live and Running
 
-## 📦 Quick Start
+## Quick Start
 
 ### Prerequisites
 - Node.js >= 18.0.0
@@ -36,7 +36,7 @@ npm run build
 npm start
 ```
 
-## 🧪 Testing
+## Testing
 
 Import the Postman collection and start testing:
 
@@ -52,7 +52,7 @@ Import the Postman collection and start testing:
    - Use Postman Collection Runner
    - Or test individual endpoints manually
 
-## 📚 Documentation Files
+## Documentation Files
 
 | File | Description |
 |------|-------------|
@@ -61,7 +61,7 @@ Import the Postman collection and start testing:
 | `SUBMISSION_SUMMARY.md` | Project overview, architecture, and deployment details |
 | `README.md` | This file - quick start guide |
 
-## 🔑 Key Features
+## Key Features
 
 - ✅ User authentication (signup/login with JWT)
 - ✅ User operations (follow, unfollow, block, unblock)
@@ -72,7 +72,7 @@ Import the Postman collection and start testing:
 - ✅ TypeScript for type safety
 - ✅ Production-ready deployment
 
-## 🏗️ Tech Stack
+## Tech Stack
 
 - **Backend:** Node.js + Express.js
 - **Language:** TypeScript
@@ -82,7 +82,7 @@ Import the Postman collection and start testing:
 - **Deployment:** Railway
 - **Database Hosting:** MongoDB Atlas
 
-## 📊 API Endpoints
+## API Endpoints
 
 ### Authentication
 - `POST /api/auth/signup` - Register user
@@ -107,7 +107,7 @@ Import the Postman collection and start testing:
 - `DELETE /api/admin/users/:id` - Delete user (admin/owner)
 - `PUT /api/admin/users/:id/role` - Update role (owner only)
 
-## 🔐 Role Hierarchy
+## Role Hierarchy
 
 ```
 Owner (Highest)
@@ -120,7 +120,7 @@ User (Basic)
   └── Standard social features
 ```
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 src/
@@ -135,7 +135,7 @@ src/
 └── utils/                # Helper functions
 ```
 
-## 🎯 Testing the API
+## Testing the API
 
 ### Using Postman (Recommended)
 
@@ -158,7 +158,7 @@ curl -X POST https://social-activity-feed-backend-production.up.railway.app/api/
   -d '{"email":"test@example.com","password":"123456"}'
 ```
 
-## 🌟 Assignment Requirements
+## Assignment Requirements
 
 All requirements have been fully implemented:
 
@@ -173,27 +173,7 @@ All requirements have been fully implemented:
 - ✅ Production deployment
 - ✅ Complete API testing suite
 
-## 📝 Submission Contents
-
-For the assignment submission, the following files are included:
-
-1. **Complete Source Code**
-   - All files in the `src/` directory
-   - Configuration files (package.json, tsconfig.json, etc.)
-
-2. **Postman Collection**
-   - `Social_Activity_Feed_Complete.postman_collection.json`
-
-3. **Documentation**
-   - `TESTING_GUIDE.md`
-   - `SUBMISSION_SUMMARY.md`
-   - `README.md` (this file)
-
-4. **Deployment**
-   - Live API on Railway
-   - MongoDB Atlas database
-
-## 🎓 Key Implementations
+## Key Implementations
 
 ### 1. Activity Feed with Blocking
 ```typescript
@@ -226,19 +206,4 @@ if (post.likes.includes(userId)) {
 }
 ```
 
-## 🤝 Contributing
 
-This is an assignment project. For any questions or issues:
-1. Check the `TESTING_GUIDE.md`
-2. Review `SUBMISSION_SUMMARY.md`
-3. Test with the provided Postman collection
-
-## 📄 License
-
-This project is created as part of a backend internship assignment.
-
----
-
-**Status:** ✅ Ready for Review
-**Last Updated:** December 3, 2024
-**Version:** 1.0.0
