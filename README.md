@@ -6,7 +6,7 @@ A comprehensive social media activity feed backend API built with Node.js, Expre
 
 **API URL:** https://social-activity-feed-backend-production.up.railway.app
 
-**Status:**Live and Running
+**Status:** Live and Running
 
 ## Quick Start
 
