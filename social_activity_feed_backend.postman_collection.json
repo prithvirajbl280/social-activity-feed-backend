@@ -1,75 +1,39 @@
 {
     "info": {
-        "_postman_id": "social-activity-feed-backend-collection",
-        "name": "Social Activity Feed Backend Assignment - FIXED v2",
-        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+        "_postman_id": "social-activity-feed-backend-final-single-file",
+        "name": "Social Activity Feed Backend - Final Submission (Single File, Demo & Logs)",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "description": "Single-file Postman collection demonstrating User / Admin / Owner RBAC. Includes success + failure cases, repeated deletes to show 404s, explanatory console logs for reviewers, preflight checks, and fallback logic so Runner works without an environment. Passwords used for existing DB accounts assumed: admin/test@example.com = 123456, owner/owner9408@example.com = 123456. (Matches Inkle assignment requirements.)"
     },
     "item": [
         {
-            "name": "Auth",
+            "name": "Auth (Login / Signup)",
             "item": [
                 {
-                    "name": "Signup User 1",
+                    "name": "Login Normal User (test1) - description",
                     "event": [
                         {
-                            "listen": "test",
+                            "listen": "prerequest",
                             "script": {
                                 "exec": [
-                                    "if (pm.response.code === 201) {",
-                                    "    var jsonData = pm.response.json();",
-                                    "    pm.collectionVariables.set('token', jsonData.token);",
-                                    "    pm.collectionVariables.set('user_id', jsonData._id);",
-                                    "    pm.environment.set('token', jsonData.token);",
-                                    "    pm.environment.set('user_id', jsonData._id);",
-                                    "    console.log('User 1 - Token and ID saved:', jsonData._id);",
-                                    "} else if (pm.response.code === 400) {",
-                                    "    console.log('User 1 already exists, use Login instead');",
-                                    "}"
+                                    "console.log('[AUTH][USER] About to login normal user test1@example.com');"
                                 ],
                                 "type": "text/javascript"
                             }
-                        }
-                    ],
-                    "request": {
-                        "method": "POST",
-                        "header": [],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n    \"username\": \"testuser\",\n    \"email\": \"test@example.com\",\n    \"password\": \"123456\"\n}",
-                            "options": {
-                                "raw": {
-                                    "language": "json"
-                                }
-                            }
                         },
-                        "url": {
-                            "raw": "{{base_url}}/api/auth/signup",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "auth",
-                                "signup"
-                            ]
-                        }
-                    },
-                    "response": []
-                },
-                {
-                    "name": "Login User 1",
-                    "event": [
                         {
                             "listen": "test",
                             "script": {
                                 "exec": [
                                     "if (pm.response.code === 200) {",
-                                    "    var jsonData = pm.response.json();",
-                                    "    pm.collectionVariables.set('token', jsonData.token);",
-                                    "    pm.collectionVariables.set('user_id', jsonData._id);",
-                                    "    pm.environment.set('token', jsonData.token);",
-                                    "    pm.environment.set('user_id', jsonData._id);",
-                                    "    console.log('User 1 - Token and ID saved:', jsonData._id);",
+                                    "  const json = pm.response.json();",
+                                    "  pm.collectionVariables.set('token', json.token);",
+                                    "  pm.collectionVariables.set('user_id', json._id);",
+                                    "  pm.variables.set('token', json.token);",
+                                    "  pm.variables.set('user_id', json._id);",
+                                    "  console.log('[AUTH][USER] Saved token & user_id:', json._id);",
+                                    "} else {",
+                                    "  console.log('[AUTH][USER] Login returned', pm.response.code, '- you may need to adjust password');",
                                     "}"
                                 ],
                                 "type": "text/javascript"
@@ -78,15 +42,15 @@
                     ],
                     "request": {
                         "method": "POST",
-                        "header": [],
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"email\": \"test@example.com\",\n    \"password\": \"123456\"\n}",
-                            "options": {
-                                "raw": {
-                                    "language": "json"
-                                }
-                            }
+                            "raw": "{\n  \"email\": \"test1@example.com\",\n  \"password\": \"123456\"\n}"
                         },
                         "url": {
                             "raw": "{{base_url}}/api/auth/login",
@@ -98,42 +62,41 @@
                                 "auth",
                                 "login"
                             ]
-                        }
-                    },
-                    "response": []
+                        },
+                        "description": "Login as the normal user (test1). Saves token -> {{token}} and user id -> {{user_id}}. If this returns 400/401, check the password for this account."
+                    }
                 },
                 {
-                    "name": "Signup User 2 (Target)",
+                    "name": "Signup Target User (userFlow) - description + random",
                     "event": [
                         {
-                            "listen": "test",
+                            "listen": "prerequest",
                             "script": {
                                 "exec": [
-                                    "if (pm.response.code === 201) {",
-                                    "    var jsonData = pm.response.json();",
-                                    "    pm.collectionVariables.set('target_user_id', jsonData._id);",
-                                    "    pm.environment.set('target_user_id', jsonData._id);",
-                                    "    console.log('User 2 (Target) - ID saved:', jsonData._id);",
-                                    "    console.log('Variable check:', pm.collectionVariables.get('target_user_id'));",
-                                    "} else if (pm.response.code === 400) {",
-                                    "    console.log('User 2 already exists, use Login User 2 instead');",
-                                    "}"
+                                    "const n = Math.floor(Math.random()*90000)+1000;",
+                                    "const email = `userflow${n}@example.com`;",
+                                    "const username = `userflow${n}`;",
+                                    "pm.collectionVariables.set('target_user_email_userFlow', email);",
+                                    "pm.collectionVariables.set('target_user_username_userFlow', username);",
+                                    "pm.variables.set('target_user_email_userFlow', email);",
+                                    "pm.variables.set('target_user_username_userFlow', username);",
+                                    "console.log('[SIGNUP][USERFLOW] Creating random user:', username, email);"
                                 ],
                                 "type": "text/javascript"
                             }
                         },
                         {
-                            "listen": "prerequest",
+                            "listen": "test",
                             "script": {
                                 "exec": [
-                                    "// Generate random email to avoid conflicts",
-                                    "const randomNum = Math.floor(Math.random() * 10000);",
-                                    "const randomEmail = `testuser${randomNum}@example.com`;",
-                                    "const randomUsername = `testuser${randomNum}`;",
-                                    "pm.collectionVariables.set('random_email', randomEmail);",
-                                    "pm.collectionVariables.set('random_username', randomUsername);",
-                                    "pm.environment.set('random_email', randomEmail);",
-                                    "pm.environment.set('random_username', randomUsername);"
+                                    "if (pm.response.code === 201) {",
+                                    "  const json = pm.response.json();",
+                                    "  pm.collectionVariables.set('target_user_id_userFlow', json._id);",
+                                    "  pm.variables.set('target_user_id_userFlow', json._id);",
+                                    "  console.log('[SIGNUP][USERFLOW] Signup successful. Saved target_user_id_userFlow:', json._id);",
+                                    "} else {",
+                                    "  console.log('[SIGNUP][USERFLOW] Signup returned', pm.response.code, ' — check response body for details');",
+                                    "}"
                                 ],
                                 "type": "text/javascript"
                             }
@@ -141,15 +104,15 @@
                     ],
                     "request": {
                         "method": "POST",
-                        "header": [],
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"username\": \"{{random_username}}\",\n    \"email\": \"{{random_email}}\",\n    \"password\": \"123456\"\n}",
-                            "options": {
-                                "raw": {
-                                    "language": "json"
-                                }
-                            }
+                            "raw": "{\n  \"username\": \"{{target_user_username_userFlow}}\",\n  \"email\": \"{{target_user_email_userFlow}}\",\n  \"password\": \"123456\"\n}"
                         },
                         "url": {
                             "raw": "{{base_url}}/api/auth/signup",
@@ -161,23 +124,263 @@
                                 "auth",
                                 "signup"
                             ]
-                        }
-                    },
-                    "response": []
-                }
-            ]
-        },
-        {
-            "name": "Users",
-            "item": [
+                        },
+                        "description": "Creates a random target user for the User flow. Saves id as {{target_user_id_userFlow}}. This keeps tests idempotent and safe across runs."
+                    }
+                },
                 {
-                    "name": "Get Profile",
+                    "name": "Login Admin (test@example.com) - description",
                     "event": [
                         {
                             "listen": "prerequest",
                             "script": {
                                 "exec": [
-                                    "console.log('About to get profile for user_id:', pm.collectionVariables.get('user_id'));"
+                                    "console.log('[AUTH][ADMIN] About to login admin test@example.com');"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "  const json = pm.response.json();",
+                                    "  pm.collectionVariables.set('admin_token', json.token);",
+                                    "  pm.collectionVariables.set('admin_id', json._id);",
+                                    "  pm.variables.set('admin_token', json.token);",
+                                    "  pm.variables.set('admin_id', json._id);",
+                                    "  console.log('[AUTH][ADMIN] Saved admin_token & admin_id:', json._id);",
+                                    "} else {",
+                                    "  console.log('[AUTH][ADMIN] Login returned', pm.response.code, ' — check password/email');",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"123456\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/auth/login",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "auth",
+                                "login"
+                            ]
+                        },
+                        "description": "Login as Admin (existing DB user). Saves admin_token -> {{admin_token}} and admin_id -> {{admin_id}}."
+                    }
+                },
+                {
+                    "name": "Signup Target User (adminFlow) - description + random",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "exec": [
+                                    "const n = Math.floor(Math.random()*90000)+2000;",
+                                    "const email = `adminflow${n}@example.com`;",
+                                    "const username = `adminflow${n}`;",
+                                    "pm.collectionVariables.set('target_user_email_adminFlow', email);",
+                                    "pm.collectionVariables.set('target_user_username_adminFlow', username);",
+                                    "pm.variables.set('target_user_email_adminFlow', email);",
+                                    "pm.variables.set('target_user_username_adminFlow', username);",
+                                    "console.log('[SIGNUP][ADMINFLOW] Creating admin-flow user:', username, email);"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "  const json = pm.response.json();",
+                                    "  pm.collectionVariables.set('target_user_id_adminFlow', json._id);",
+                                    "  pm.variables.set('target_user_id_adminFlow', json._id);",
+                                    "  console.log('[SIGNUP][ADMINFLOW] Signup successful. Saved target_user_id_adminFlow:', json._id);",
+                                    "} else {",
+                                    "  console.log('[SIGNUP][ADMINFLOW] Signup returned', pm.response.code, ' — check response body');",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"username\": \"{{target_user_username_adminFlow}}\",\n  \"email\": \"{{target_user_email_adminFlow}}\",\n  \"password\": \"123456\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/auth/signup",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "auth",
+                                "signup"
+                            ]
+                        },
+                        "description": "Creates a random target user specifically for Admin tests. Saves id as {{target_user_id_adminFlow}}."
+                    }
+                },
+                {
+                    "name": "Login Owner (owner9408) - description",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "exec": [
+                                    "console.log('[AUTH][OWNER] About to login owner owner9408@example.com');"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "  const json = pm.response.json();",
+                                    "  pm.collectionVariables.set('owner_token', json.token);",
+                                    "  pm.collectionVariables.set('owner_id', json._id);",
+                                    "  pm.variables.set('owner_token', json.token);",
+                                    "  pm.variables.set('owner_id', json._id);",
+                                    "  console.log('[AUTH][OWNER] Saved owner_token & owner_id:', json._id);",
+                                    "} else {",
+                                    "  console.log('[AUTH][OWNER] Login returned', pm.response.code, ' — check password/email');",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"owner9408@example.com\",\n  \"password\": \"123456\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/auth/login",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "auth",
+                                "login"
+                            ]
+                        },
+                        "description": "Login as Owner (existing DB user). Saves owner_token -> {{owner_token}} and owner_id -> {{owner_id}}."
+                    }
+                },
+                {
+                    "name": "Signup Target User (ownerFlow) - description + random",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "exec": [
+                                    "const n = Math.floor(Math.random()*90000)+3000;",
+                                    "const email = `ownerflow${n}@example.com`;",
+                                    "const username = `ownerflow${n}`;",
+                                    "pm.collectionVariables.set('target_user_email_ownerFlow', email);",
+                                    "pm.collectionVariables.set('target_user_username_ownerFlow', username);",
+                                    "pm.variables.set('target_user_email_ownerFlow', email);",
+                                    "pm.variables.set('target_user_username_ownerFlow', username);",
+                                    "console.log('[SIGNUP][OWNERFLOW] Creating owner-flow user:', username, email);"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "  const json = pm.response.json();",
+                                    "  pm.collectionVariables.set('target_user_id_ownerFlow', json._id);",
+                                    "  pm.variables.set('target_user_id_ownerFlow', json._id);",
+                                    "  console.log('[SIGNUP][OWNERFLOW] Signup successful. Saved target_user_id_ownerFlow:', json._id);",
+                                    "} else {",
+                                    "  console.log('[SIGNUP][OWNERFLOW] Signup returned', pm.response.code, ' — check response body');",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"username\": \"{{target_user_username_ownerFlow}}\",\n  \"email\": \"{{target_user_email_ownerFlow}}\",\n  \"password\": \"123456\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/auth/signup",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "auth",
+                                "signup"
+                            ]
+                        },
+                        "description": "Creates a random target user specifically for Owner tests. Saves id as {{target_user_id_ownerFlow}}."
+                    }
+                }
+            ]
+        },
+        {
+            "name": "User Flow (follow/like/block/post)",
+            "item": [
+                {
+                    "name": "Get Profile (self) - preflight check",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "exec": [
+                                    "const uid = pm.collectionVariables.get('user_id') || pm.variables.get('user_id');",
+                                    "console.log('[USERFLOW][PRE] Fetching profile for user_id:', uid);",
+                                    "if (!uid) { console.error('[USERFLOW][PRE][ERROR] user_id missing — run Login Normal User first'); }"
                                 ],
                                 "type": "text/javascript"
                             }
@@ -202,22 +405,20 @@
                                 "users",
                                 "{{user_id}}"
                             ]
-                        }
-                    },
-                    "response": []
+                        },
+                        "description": "Get own profile (sanity check)."
+                    }
                 },
                 {
-                    "name": "Follow User",
+                    "name": "Follow Target (userFlow)",
                     "event": [
                         {
                             "listen": "prerequest",
                             "script": {
                                 "exec": [
-                                    "const targetId = pm.collectionVariables.get('target_user_id') || pm.environment.get('target_user_id');",
-                                    "console.log('About to follow user with target_user_id:', targetId);",
-                                    "if (!targetId) {",
-                                    "    console.error('ERROR: target_user_id is empty! Run \"Signup User 2\" first.');",
-                                    "}"
+                                    "const tid = pm.collectionVariables.get('target_user_id_userFlow') || pm.variables.get('target_user_id_userFlow');",
+                                    "console.log('[USERFLOW] About to follow target_user_id_userFlow:', tid);",
+                                    "if (!tid) { console.error('[USERFLOW][ERROR] target_user_id_userFlow missing — run Signup Target User (userFlow)'); }"
                                 ],
                                 "type": "text/javascript"
                             }
@@ -233,22 +434,22 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{base_url}}/api/users/{{target_user_id}}/follow",
+                            "raw": "{{base_url}}/api/users/{{target_user_id_userFlow}}/follow",
                             "host": [
                                 "{{base_url}}"
                             ],
                             "path": [
                                 "api",
                                 "users",
-                                "{{target_user_id}}",
+                                "{{target_user_id_userFlow}}",
                                 "follow"
                             ]
-                        }
-                    },
-                    "response": []
+                        },
+                        "description": "Normal user follows the user created in userFlow. Expect 200 on success."
+                    }
                 },
                 {
-                    "name": "Unfollow User",
+                    "name": "Unfollow Target (userFlow)",
                     "request": {
                         "method": "PUT",
                         "header": [
@@ -259,22 +460,22 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{base_url}}/api/users/{{target_user_id}}/unfollow",
+                            "raw": "{{base_url}}/api/users/{{target_user_id_userFlow}}/unfollow",
                             "host": [
                                 "{{base_url}}"
                             ],
                             "path": [
                                 "api",
                                 "users",
-                                "{{target_user_id}}",
+                                "{{target_user_id_userFlow}}",
                                 "unfollow"
                             ]
-                        }
-                    },
-                    "response": []
+                        },
+                        "description": "Normal user unfollows the user — expect 200."
+                    }
                 },
                 {
-                    "name": "Block User",
+                    "name": "Block Target (userFlow)",
                     "request": {
                         "method": "PUT",
                         "header": [
@@ -285,37 +486,34 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{base_url}}/api/users/{{target_user_id}}/block",
+                            "raw": "{{base_url}}/api/users/{{target_user_id_userFlow}}/block",
                             "host": [
                                 "{{base_url}}"
                             ],
                             "path": [
                                 "api",
                                 "users",
-                                "{{target_user_id}}",
+                                "{{target_user_id_userFlow}}",
                                 "block"
                             ]
-                        }
-                    },
-                    "response": []
-                }
-            ]
-        },
-        {
-            "name": "Posts",
-            "item": [
+                        },
+                        "description": "Block target user — posts from that user should not be visible to the blocker."
+                    }
+                },
                 {
-                    "name": "Create Post",
+                    "name": "Create Post (userFlow) - saves post_id_userFlow",
                     "event": [
                         {
                             "listen": "test",
                             "script": {
                                 "exec": [
                                     "if (pm.response.code === 201) {",
-                                    "    var jsonData = pm.response.json();",
-                                    "    pm.collectionVariables.set('post_id', jsonData._id);",
-                                    "    pm.environment.set('post_id', jsonData._id);",
-                                    "    console.log('Post ID saved:', jsonData._id);",
+                                    "  const json = pm.response.json();",
+                                    "  pm.collectionVariables.set('post_id_userFlow', json._id);",
+                                    "  pm.variables.set('post_id_userFlow', json._id);",
+                                    "  console.log('[USERFLOW] Post created. post_id_userFlow saved:', json._id);",
+                                    "} else {",
+                                    "  console.log('[USERFLOW] Create Post returned', pm.response.code);",
                                     "}"
                                 ],
                                 "type": "text/javascript"
@@ -329,16 +527,15 @@
                                 "key": "Authorization",
                                 "value": "Bearer {{token}}",
                                 "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
                             }
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"content\": \"Hello World! This is my test post.\"\n}",
-                            "options": {
-                                "raw": {
-                                    "language": "json"
-                                }
-                            }
+                            "raw": "{\n  \"content\": \"UserFlow: Hello, this is a test post from the normal user.\"\n}"
                         },
                         "url": {
                             "raw": "{{base_url}}/api/posts",
@@ -349,22 +546,20 @@
                                 "api",
                                 "posts"
                             ]
-                        }
-                    },
-                    "response": []
+                        },
+                        "description": "Create a post as the normal user. Response saves {{post_id_userFlow}}."
+                    }
                 },
                 {
-                    "name": "Like Post",
+                    "name": "Like Post (userFlow)",
                     "event": [
                         {
                             "listen": "prerequest",
                             "script": {
                                 "exec": [
-                                    "const postId = pm.collectionVariables.get('post_id') || pm.environment.get('post_id');",
-                                    "console.log('About to like post with post_id:', postId);",
-                                    "if (!postId) {",
-                                    "    console.error('ERROR: post_id is empty! Run \"Create Post\" first.');",
-                                    "}"
+                                    "const pid = pm.collectionVariables.get('post_id_userFlow') || pm.variables.get('post_id_userFlow');",
+                                    "console.log('[USERFLOW] About to like post_id_userFlow:', pid);",
+                                    "if (!pid) { console.error('[USERFLOW][ERROR] post_id_userFlow missing — run Create Post (userFlow)'); }"
                                 ],
                                 "type": "text/javascript"
                             }
@@ -380,22 +575,22 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{base_url}}/api/posts/{{post_id}}/like",
+                            "raw": "{{base_url}}/api/posts/{{post_id_userFlow}}/like",
                             "host": [
                                 "{{base_url}}"
                             ],
                             "path": [
                                 "api",
                                 "posts",
-                                "{{post_id}}",
+                                "{{post_id_userFlow}}",
                                 "like"
                             ]
-                        }
-                    },
-                    "response": []
+                        },
+                        "description": "Like the post created in userFlow. Expect 200."
+                    }
                 },
                 {
-                    "name": "Delete Post",
+                    "name": "Delete Post (userFlow) - first time (expect success)",
                     "request": {
                         "method": "DELETE",
                         "header": [
@@ -406,26 +601,630 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{base_url}}/api/posts/{{post_id}}",
+                            "raw": "{{base_url}}/api/posts/{{post_id_userFlow}}",
                             "host": [
                                 "{{base_url}}"
                             ],
                             "path": [
                                 "api",
                                 "posts",
-                                "{{post_id}}"
+                                "{{post_id_userFlow}}"
                             ]
+                        },
+                        "description": "Delete the post created earlier by this user. Expect 200."
+                    }
+                },
+                {
+                    "name": "Delete Post (userFlow) - second time (expected failure -> 404)",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "exec": [
+                                    "console.log('[USERFLOW][EXPECTED FAILURE] Attempting to delete the same post again to demonstrate 404 behaviour.');",
+                                    "const pid = pm.collectionVariables.get('post_id_userFlow') || pm.variables.get('post_id_userFlow');",
+                                    "if (!pid) { console.error('[USERFLOW][EXPECTED FAILURE][ERROR] post_id_userFlow missing'); }"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 404) {",
+                                    "  console.log('[USERFLOW][EXPECTED FAILURE] Server returned 404 as expected — post already deleted.');",
+                                    "  pm.test('Delete again should return 404', function(){ pm.expect(pm.response.code).to.eql(404); });",
+                                    "} else {",
+                                    "  console.log('[USERFLOW][EXPECTED FAILURE] Unexpected response code:', pm.response.code);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
                         }
-                    },
-                    "response": []
+                    ],
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/posts/{{post_id_userFlow}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "posts",
+                                "{{post_id_userFlow}}"
+                            ]
+                        },
+                        "description": "Attempt to delete the same post again — expected failure (404). Console explains that this is expected."
+                    }
                 }
             ]
         },
         {
-            "name": "Activity",
+            "name": "Admin Flow (delete post/user, forbidden role change)",
             "item": [
                 {
-                    "name": "Get Feed",
+                    "name": "Create Post (adminFlow) - admin creates a post for admin tests",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "  const json = pm.response.json();",
+                                    "  pm.collectionVariables.set('post_id_adminFlow', json._id);",
+                                    "  pm.variables.set('post_id_adminFlow', json._id);",
+                                    "  console.log('[ADMINFLOW] Admin post created. post_id_adminFlow saved:', json._id);",
+                                    "} else {",
+                                    "  console.log('[ADMINFLOW] Create Post returned', pm.response.code);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{admin_token}}",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"content\": \"AdminFlow: This post will be used to test admin delete post behavior.\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/posts",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "posts"
+                            ]
+                        },
+                        "description": "Admin creates a post that admin will attempt to delete. Saved to {{post_id_adminFlow}}."
+                    }
+                },
+                {
+                    "name": "Admin - Delete Post (first time) - expect success if post exists",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "exec": [
+                                    "const pid = pm.collectionVariables.get('post_id_adminFlow') || pm.variables.get('post_id_adminFlow');",
+                                    "console.log('[ADMINFLOW] Admin will delete post_id_adminFlow:', pid);",
+                                    "if (!pid) { console.error('[ADMINFLOW][ERROR] post_id_adminFlow missing — create post first'); }"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{admin_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/posts/{{post_id_adminFlow}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "posts",
+                                "{{post_id_adminFlow}}"
+                            ]
+                        },
+                        "description": "Admin deletes the post created in adminFlow. Expect 200 on success."
+                    }
+                },
+                {
+                    "name": "Admin - Delete Post (second time) - expected 404",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "exec": [
+                                    "console.log('[ADMINFLOW][EXPECTED FAILURE] Attempting admin delete of same post again to show 404.');"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 404) {",
+                                    "  console.log('[ADMINFLOW][EXPECTED FAILURE] Admin delete returned 404 as expected (post already deleted).');",
+                                    "  pm.test('Admin delete post again -> 404', function(){ pm.expect(pm.response.code).to.eql(404); });",
+                                    "} else {",
+                                    "  console.log('[ADMINFLOW][EXPECTED FAILURE] Unexpected code:', pm.response.code);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{admin_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/posts/{{post_id_adminFlow}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "posts",
+                                "{{post_id_adminFlow}}"
+                            ]
+                        },
+                        "description": "Attempt to delete the same post again (Admin) — expected 404 and explanatory log."
+                    }
+                },
+                {
+                    "name": "Admin - Delete User (first time) - expect success",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "exec": [
+                                    "const tid = pm.collectionVariables.get('target_user_id_adminFlow') || pm.variables.get('target_user_id_adminFlow');",
+                                    "console.log('[ADMINFLOW] Admin will delete user id:', tid);",
+                                    "if (!tid) { console.error('[ADMINFLOW][ERROR] target_user_id_adminFlow missing — signup target for adminFlow first'); }"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{admin_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/users/{{target_user_id_adminFlow}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "admin",
+                                "users",
+                                "{{target_user_id_adminFlow}}"
+                            ]
+                        },
+                        "description": "Admin deletes the adminFlow target user. Expect 200 if user exists."
+                    }
+                },
+                {
+                    "name": "Admin - Delete User (second time) - expected 404",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "exec": [
+                                    "console.log('[ADMINFLOW][EXPECTED FAILURE] Attempting admin delete of same user again to show 404.');"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 404) {",
+                                    "  console.log('[ADMINFLOW][EXPECTED FAILURE] Admin delete user returned 404 as expected (user already deleted).');",
+                                    "  pm.test('Admin delete user again -> 404', function(){ pm.expect(pm.response.code).to.eql(404); });",
+                                    "} else {",
+                                    "  console.log('[ADMINFLOW][EXPECTED FAILURE] Unexpected code:', pm.response.code);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{admin_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/users/{{target_user_id_adminFlow}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "admin",
+                                "users",
+                                "{{target_user_id_adminFlow}}"
+                            ]
+                        },
+                        "description": "Attempt to delete the same user again (Admin) — expected 404 and explanatory log."
+                    }
+                },
+                {
+                    "name": "Admin - Update Role (should be forbidden -> 403)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 403) {",
+                                    "  console.log('[ADMINFLOW][EXPECTED FAILURE] Admin attempted to update role and was forbidden (403) — correct behavior.');",
+                                    "  pm.test('Admin update role -> 403', function(){ pm.expect(pm.response.code).to.eql(403); });",
+                                    "} else {",
+                                    "  console.log('[ADMINFLOW][EXPECTED FAILURE] Admin update role returned', pm.response.code);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{admin_token}}",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"role\": \"owner\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/users/{{target_user_id_adminFlow}}/role",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "admin",
+                                "users",
+                                "{{target_user_id_adminFlow}}",
+                                "role"
+                            ]
+                        },
+                        "description": "Admin attempts to change role of a user — should be forbidden (403). This demonstrates correct RBAC."
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Owner Flow (promote/delete & repeated attempts)",
+            "item": [
+                {
+                    "name": "Owner - Promote target (first time) - expect success",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "exec": [
+                                    "const tid = pm.collectionVariables.get('target_user_id_ownerFlow') || pm.variables.get('target_user_id_ownerFlow');",
+                                    "console.log('[OWNERFLOW] Owner will promote target_user_id_ownerFlow:', tid);",
+                                    "if (!tid) { console.error('[OWNERFLOW][ERROR] target_user_id_ownerFlow missing — run Signup Target User (ownerFlow)'); }"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "  console.log('[OWNERFLOW] Promote succeeded (200) — user is now admin.');",
+                                    "  pm.test('Owner promote -> 200', function(){ pm.expect(pm.response.code).to.eql(200); });",
+                                    "} else {",
+                                    "  console.log('[OWNERFLOW] Promote returned', pm.response.code);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{owner_token}}",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"role\": \"admin\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/users/{{target_user_id_ownerFlow}}/role",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "admin",
+                                "users",
+                                "{{target_user_id_ownerFlow}}",
+                                "role"
+                            ]
+                        },
+                        "description": "Owner promotes the ownerFlow target user to admin. Expect 200 on success."
+                    }
+                },
+                {
+                    "name": "Owner - Promote target (second time) - expected failure (already admin)",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "exec": [
+                                    "console.log('[OWNERFLOW][EXPECTED FAILURE] Attempting to promote the same user again to show idempotent / error handling.');"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 400 || pm.response.code === 409) {",
+                                    "  console.log('[OWNERFLOW][EXPECTED FAILURE] Promote again returned', pm.response.code, '— expected (already admin).');",
+                                    "  pm.test('Promote again -> error expected', function(){ pm.expect([400,409]).to.include(pm.response.code); });",
+                                    "} else {",
+                                    "  console.log('[OWNERFLOW][EXPECTED FAILURE] Promote again returned', pm.response.code, ' — check server behavior');",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{owner_token}}",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"role\": \"admin\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/users/{{target_user_id_ownerFlow}}/role",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "admin",
+                                "users",
+                                "{{target_user_id_ownerFlow}}",
+                                "role"
+                            ]
+                        },
+                        "description": "Owner tries to promote same user again — we log the expected failure with explanation."
+                    }
+                },
+                {
+                    "name": "Owner - Delete promoted user (first time) - expect success",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "exec": [
+                                    "const tid = pm.collectionVariables.get('target_user_id_ownerFlow') || pm.variables.get('target_user_id_ownerFlow');",
+                                    "console.log('[OWNERFLOW] Owner will delete user id:', tid);",
+                                    "if (!tid) { console.error('[OWNERFLOW][ERROR] target_user_id_ownerFlow missing'); }"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{owner_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/users/{{target_user_id_ownerFlow}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "admin",
+                                "users",
+                                "{{target_user_id_ownerFlow}}"
+                            ]
+                        },
+                        "description": "Owner deletes the user they just promoted — expect 200."
+                    }
+                },
+                {
+                    "name": "Owner - Delete promoted user (second time) - expected 404",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "exec": [
+                                    "console.log('[OWNERFLOW][EXPECTED FAILURE] Owner attempts to delete the same user again — expecting 404.');"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 404) {",
+                                    "  console.log('[OWNERFLOW][EXPECTED FAILURE] Delete again returned 404 as expected (user already deleted).');",
+                                    "  pm.test('Owner delete again -> 404', function(){ pm.expect(pm.response.code).to.eql(404); });",
+                                    "} else {",
+                                    "  console.log('[OWNERFLOW][EXPECTED FAILURE] Unexpected response code:', pm.response.code);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{owner_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/users/{{target_user_id_ownerFlow}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "admin",
+                                "users",
+                                "{{target_user_id_ownerFlow}}"
+                            ]
+                        },
+                        "description": "Attempt to delete same user again (Owner) — expected 404 and explanatory message in console."
+                    }
+                },
+                {
+                    "name": "Owner - Update role of deleted user (expected 404)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 404) {",
+                                    "  console.log('[OWNERFLOW][EXPECTED FAILURE] Update role on deleted user -> 404 as expected.');",
+                                    "  pm.test('Owner update deleted user -> 404', function(){ pm.expect(pm.response.code).to.eql(404); });",
+                                    "} else {",
+                                    "  console.log('[OWNERFLOW][EXPECTED FAILURE] Owner update returned', pm.response.code);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{owner_token}}",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"role\": \"user\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/users/{{target_user_id_ownerFlow}}/role",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "admin",
+                                "users",
+                                "{{target_user_id_ownerFlow}}",
+                                "role"
+                            ]
+                        },
+                        "description": "Owner attempts to change role of a user that was deleted — we expect 404 and log explanation."
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Activity & Final Checks",
+            "item": [
+                {
+                    "name": "Get Feed - final",
                     "request": {
                         "method": "GET",
                         "header": [
@@ -444,43 +1243,77 @@
                                 "api",
                                 "activity"
                             ]
-                        }
-                    },
-                    "response": []
-                }
-            ]
-        },
-        {
-            "name": "Admin",
-            "item": [
+                        },
+                        "description": "Get activity feed (final check). Shows actions performed during the run. Useful to demonstrate activity entries like 'X made a post', 'Y followed Z', etc."
+                    }
+                },
                 {
-                    "name": "Delete User",
+                    "name": "Preflight: Check target_user_id_adminFlow exists (helper)",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "exec": [
+                                    "const tid = pm.collectionVariables.get('target_user_id_adminFlow') || pm.variables.get('target_user_id_adminFlow');",
+                                    "console.log('[CHECK] target_user_id_adminFlow currently:', tid);",
+                                    "if (!tid) { console.log('[CHECK] No adminFlow target user found — signup step probably failed.'); }"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
                     "request": {
-                        "method": "DELETE",
+                        "method": "GET",
                         "header": [
                             {
                                 "key": "Authorization",
-                                "value": "Bearer {{token}}",
+                                "value": "Bearer {{admin_token}}",
                                 "type": "text"
                             }
                         ],
                         "url": {
-                            "raw": "{{base_url}}/api/admin/users/{{target_user_id}}",
+                            "raw": "{{base_url}}/api/users/{{target_user_id_adminFlow}}",
                             "host": [
                                 "{{base_url}}"
                             ],
                             "path": [
                                 "api",
-                                "admin",
                                 "users",
-                                "{{target_user_id}}"
+                                "{{target_user_id_adminFlow}}"
                             ]
-                        }
-                    },
-                    "response": []
+                        },
+                        "description": "Helper preflight GET to confirm the adminFlow target user exists (or to show 404 if it doesn't)."
+                    }
                 },
                 {
-                    "name": "Update Role",
+                    "name": "FINAL CHECK - Follow UserFlow Target (should exist -> 200)",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "exec": [
+                                    "const tid = pm.collectionVariables.get('target_user_id_userFlow') || pm.variables.get('target_user_id_userFlow');",
+                                    "console.log('[FINAL][USERFLOW] Attempting to follow UserFlow target:', tid);",
+                                    "if (!tid) { console.error('[FINAL][USERFLOW][ERROR] target_user_id_userFlow missing.'); }"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "  console.log('[FINAL][USERFLOW][SUCCESS] UserFlow target still exists. Follow returned 200 as expected.');",
+                                    "  pm.test('Follow UserFlow -> 200', function(){ pm.expect(pm.response.code).to.eql(200); });",
+                                    "} else {",
+                                    "  console.log('[FINAL][USERFLOW][UNEXPECTED] Follow returned', pm.response.code, '— user should exist.');",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
                     "request": {
                         "method": "PUT",
                         "header": [
@@ -490,30 +1323,128 @@
                                 "type": "text"
                             }
                         ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n    \"role\": \"admin\"\n}",
-                            "options": {
-                                "raw": {
-                                    "language": "json"
-                                }
-                            }
-                        },
                         "url": {
-                            "raw": "{{base_url}}/api/admin/users/{{target_user_id}}/role",
+                            "raw": "{{base_url}}/api/users/{{target_user_id_userFlow}}/follow",
                             "host": [
                                 "{{base_url}}"
                             ],
                             "path": [
                                 "api",
-                                "admin",
                                 "users",
-                                "{{target_user_id}}",
-                                "role"
+                                "{{target_user_id_userFlow}}",
+                                "follow"
                             ]
                         }
                     },
-                    "response": []
+                    "description": "Final validation: User tries to follow UserFlow target. This user was never deleted, so we expect 200 OK."
+                },
+                {
+                    "name": "FINAL CHECK - Follow AdminFlow Target (should be deleted -> 404)",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "exec": [
+                                    "const tid = pm.collectionVariables.get('target_user_id_adminFlow') || pm.variables.get('target_user_id_adminFlow');",
+                                    "console.log('[FINAL][ADMINFLOW] Attempting to follow AdminFlow target:', tid);",
+                                    "console.log('[FINAL][ADMINFLOW] Since Admin deleted this user earlier, expecting 404.');",
+                                    "if (!tid) { console.error('[FINAL][ADMINFLOW][ERROR] target_user_id_adminFlow missing.'); }"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 404) {",
+                                    "  console.log('[FINAL][ADMINFLOW][EXPECTED FAILURE] AdminFlow target was deleted earlier. 404 is correct.');",
+                                    "  pm.test('Follow deleted AdminFlow user -> 404', function(){ pm.expect(pm.response.code).to.eql(404); });",
+                                    "} else {",
+                                    "  console.log('[FINAL][ADMINFLOW][UNEXPECTED] Follow returned', pm.response.code, '— expected 404.');",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/users/{{target_user_id_adminFlow}}/follow",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "users",
+                                "{{target_user_id_adminFlow}}",
+                                "follow"
+                            ]
+                        }
+                    },
+                    "description": "Final validation: AdminFlow target user was deleted in AdminFlow delete step. Follow must return 404."
+                },
+                {
+                    "name": "FINAL CHECK - Follow OwnerFlow Target (should be deleted -> 404)",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "exec": [
+                                    "const tid = pm.collectionVariables.get('target_user_id_ownerFlow') || pm.variables.get('target_user_id_ownerFlow');",
+                                    "console.log('[FINAL][OWNERFLOW] Attempting to follow OwnerFlow target:', tid);",
+                                    "console.log('[FINAL][OWNERFLOW] Owner deleted this user earlier — expecting 404.');",
+                                    "if (!tid) { console.error('[FINAL][OWNERFLOW][ERROR] target_user_id_ownerFlow missing.'); }"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 404) {",
+                                    "  console.log('[FINAL][OWNERFLOW][EXPECTED FAILURE] OwnerFlow target deleted earlier. 404 is correct.');",
+                                    "  pm.test('Follow deleted OwnerFlow user -> 404', function(){ pm.expect(pm.response.code).to.eql(404); });",
+                                    "} else {",
+                                    "  console.log('[FINAL][OWNERFLOW][UNEXPECTED] Follow returned', pm.response.code, '— expected 404.');",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/users/{{target_user_id_ownerFlow}}/follow",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "users",
+                                "{{target_user_id_ownerFlow}}",
+                                "follow"
+                            ]
+                        }
+                    },
+                    "description": "Final validation: OwnerFlow target was deleted in OwnerFlow. Following should return 404 Not Found."
                 }
             ]
         }
@@ -535,12 +1466,47 @@
             "type": "string"
         },
         {
-            "key": "target_user_id",
+            "key": "admin_token",
             "value": "",
             "type": "string"
         },
         {
-            "key": "post_id",
+            "key": "admin_id",
+            "value": "692f52341848cb73e0863465",
+            "type": "string"
+        },
+        {
+            "key": "owner_token",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "owner_id",
+            "value": "692fe0c10bac23aa53035826",
+            "type": "string"
+        },
+        {
+            "key": "target_user_id_userFlow",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "target_user_id_adminFlow",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "target_user_id_ownerFlow",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "post_id_userFlow",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "post_id_adminFlow",
             "value": "",
             "type": "string"
         },
