@@ -1,7 +1,7 @@
 {
     "info": {
         "_postman_id": "social-activity-feed-backend-collection",
-        "name": "Social Activity Feed Backend Assignment",
+        "name": "Social Activity Feed Backend Assignment - FIXED v2",
         "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
     },
     "item": [
@@ -9,7 +9,27 @@
             "name": "Auth",
             "item": [
                 {
-                    "name": "Signup",
+                    "name": "Signup User 1",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.collectionVariables.set('token', jsonData.token);",
+                                    "    pm.collectionVariables.set('user_id', jsonData._id);",
+                                    "    pm.environment.set('token', jsonData.token);",
+                                    "    pm.environment.set('user_id', jsonData._id);",
+                                    "    console.log('User 1 - Token and ID saved:', jsonData._id);",
+                                    "} else if (pm.response.code === 400) {",
+                                    "    console.log('User 1 already exists, use Login instead');",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
                     "request": {
                         "method": "POST",
                         "header": [],
@@ -37,7 +57,25 @@
                     "response": []
                 },
                 {
-                    "name": "Login",
+                    "name": "Login User 1",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.collectionVariables.set('token', jsonData.token);",
+                                    "    pm.collectionVariables.set('user_id', jsonData._id);",
+                                    "    pm.environment.set('token', jsonData.token);",
+                                    "    pm.environment.set('user_id', jsonData._id);",
+                                    "    console.log('User 1 - Token and ID saved:', jsonData._id);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
                     "request": {
                         "method": "POST",
                         "header": [],
@@ -63,6 +101,69 @@
                         }
                     },
                     "response": []
+                },
+                {
+                    "name": "Signup User 2 (Target)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.collectionVariables.set('target_user_id', jsonData._id);",
+                                    "    pm.environment.set('target_user_id', jsonData._id);",
+                                    "    console.log('User 2 (Target) - ID saved:', jsonData._id);",
+                                    "    console.log('Variable check:', pm.collectionVariables.get('target_user_id'));",
+                                    "} else if (pm.response.code === 400) {",
+                                    "    console.log('User 2 already exists, use Login User 2 instead');",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        },
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "exec": [
+                                    "// Generate random email to avoid conflicts",
+                                    "const randomNum = Math.floor(Math.random() * 10000);",
+                                    "const randomEmail = `testuser${randomNum}@example.com`;",
+                                    "const randomUsername = `testuser${randomNum}`;",
+                                    "pm.collectionVariables.set('random_email', randomEmail);",
+                                    "pm.collectionVariables.set('random_username', randomUsername);",
+                                    "pm.environment.set('random_email', randomEmail);",
+                                    "pm.environment.set('random_username', randomUsername);"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"username\": \"{{random_username}}\",\n    \"email\": \"{{random_email}}\",\n    \"password\": \"123456\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/auth/signup",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "auth",
+                                "signup"
+                            ]
+                        }
+                    },
+                    "response": []
                 }
             ]
         },
@@ -71,6 +172,17 @@
             "item": [
                 {
                     "name": "Get Profile",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "exec": [
+                                    "console.log('About to get profile for user_id:', pm.collectionVariables.get('user_id'));"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
                     "request": {
                         "method": "GET",
                         "header": [
@@ -96,6 +208,21 @@
                 },
                 {
                     "name": "Follow User",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "exec": [
+                                    "const targetId = pm.collectionVariables.get('target_user_id') || pm.environment.get('target_user_id');",
+                                    "console.log('About to follow user with target_user_id:', targetId);",
+                                    "if (!targetId) {",
+                                    "    console.error('ERROR: target_user_id is empty! Run \"Signup User 2\" first.');",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
                     "request": {
                         "method": "PUT",
                         "header": [
@@ -179,6 +306,22 @@
             "item": [
                 {
                     "name": "Create Post",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.collectionVariables.set('post_id', jsonData._id);",
+                                    "    pm.environment.set('post_id', jsonData._id);",
+                                    "    console.log('Post ID saved:', jsonData._id);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
                     "request": {
                         "method": "POST",
                         "header": [
@@ -190,7 +333,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"content\": \"Hello World!\"\n}",
+                            "raw": "{\n    \"content\": \"Hello World! This is my test post.\"\n}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -212,6 +355,21 @@
                 },
                 {
                     "name": "Like Post",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "exec": [
+                                    "const postId = pm.collectionVariables.get('post_id') || pm.environment.get('post_id');",
+                                    "console.log('About to like post with post_id:', postId);",
+                                    "if (!postId) {",
+                                    "    console.error('ERROR: post_id is empty! Run \"Create Post\" first.');",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
                     "request": {
                         "method": "PUT",
                         "header": [
@@ -363,7 +521,7 @@
     "variable": [
         {
             "key": "base_url",
-            "value": "social-activity-feed-backend-production.up.railway.app",
+            "value": "https://social-activity-feed-backend-production.up.railway.app",
             "type": "string"
         },
         {
@@ -385,7 +543,16 @@
             "key": "post_id",
             "value": "",
             "type": "string"
+        },
+        {
+            "key": "random_email",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "random_username",
+            "value": "",
+            "type": "string"
         }
     ]
 }
-
