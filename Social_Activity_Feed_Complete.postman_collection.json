@@ -1,0 +1,1036 @@
+{
+    "info": {
+        "_postman_id": "social-activity-feed-complete",
+        "name": "Social Activity Feed - Complete Testing Suite",
+        "description": "Comprehensive test collection for Social Activity Feed Backend with User, Admin, and Owner role testing",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "1. Setup - Create Test Users",
+            "item": [
+                {
+                    "name": "Create Regular User (User 1)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.collectionVariables.set('user1_token', jsonData.token);",
+                                    "    pm.collectionVariables.set('user1_id', jsonData._id);",
+                                    "    pm.environment.set('user1_token', jsonData.token);",
+                                    "    pm.environment.set('user1_id', jsonData._id);",
+                                    "    console.log('✓ Regular User 1 created:', jsonData._id);",
+                                    "} else if (pm.response.code === 400) {",
+                                    "    console.log('ℹ User 1 already exists, use Login Regular User 1');",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"username\": \"regularuser\",\n    \"email\": \"user@example.com\",\n    \"password\": \"password123\",\n    \"role\": \"user\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/auth/signup",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "auth", "signup"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Login Regular User (User 1)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.collectionVariables.set('user1_token', jsonData.token);",
+                                    "    pm.collectionVariables.set('user1_id', jsonData._id);",
+                                    "    pm.environment.set('user1_token', jsonData.token);",
+                                    "    pm.environment.set('user1_id', jsonData._id);",
+                                    "    console.log('✓ Regular User 1 logged in:', jsonData._id);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"user@example.com\",\n    \"password\": \"password123\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/auth/login",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "auth", "login"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Create Regular User (User 2 - Target)",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "exec": [
+                                    "const randomNum = Math.floor(Math.random() * 10000);",
+                                    "const randomEmail = `testuser${randomNum}@example.com`;",
+                                    "const randomUsername = `testuser${randomNum}`;",
+                                    "pm.collectionVariables.set('random_email', randomEmail);",
+                                    "pm.collectionVariables.set('random_username', randomUsername);",
+                                    "pm.environment.set('random_email', randomEmail);",
+                                    "pm.environment.set('random_username', randomUsername);"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.collectionVariables.set('user2_id', jsonData._id);",
+                                    "    pm.environment.set('user2_id', jsonData._id);",
+                                    "    console.log('✓ Regular User 2 created:', jsonData._id);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"username\": \"{{random_username}}\",\n    \"email\": \"{{random_email}}\",\n    \"password\": \"password123\",\n    \"role\": \"user\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/auth/signup",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "auth", "signup"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Create Admin User",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.collectionVariables.set('admin_token', jsonData.token);",
+                                    "    pm.collectionVariables.set('admin_id', jsonData._id);",
+                                    "    pm.environment.set('admin_token', jsonData.token);",
+                                    "    pm.environment.set('admin_id', jsonData._id);",
+                                    "    console.log('✓ Admin User created:', jsonData._id);",
+                                    "} else if (pm.response.code === 400) {",
+                                    "    console.log('ℹ Admin User already exists, use Login Admin User');",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"username\": \"adminuser\",\n    \"email\": \"admin@example.com\",\n    \"password\": \"admin123\",\n    \"role\": \"admin\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/auth/signup",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "auth", "signup"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Login Admin User",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.collectionVariables.set('admin_token', jsonData.token);",
+                                    "    pm.collectionVariables.set('admin_id', jsonData._id);",
+                                    "    pm.environment.set('admin_token', jsonData.token);",
+                                    "    pm.environment.set('admin_id', jsonData._id);",
+                                    "    console.log('✓ Admin User logged in:', jsonData._id);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"admin@example.com\",\n    \"password\": \"admin123\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/auth/login",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "auth", "login"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Create Owner User",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.collectionVariables.set('owner_token', jsonData.token);",
+                                    "    pm.collectionVariables.set('owner_id', jsonData._id);",
+                                    "    pm.environment.set('owner_token', jsonData.token);",
+                                    "    pm.environment.set('owner_id', jsonData._id);",
+                                    "    console.log('✓ Owner User created:', jsonData._id);",
+                                    "} else if (pm.response.code === 400) {",
+                                    "    console.log('ℹ Owner User already exists, use Login Owner User');",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"username\": \"owneruser\",\n    \"email\": \"owner@example.com\",\n    \"password\": \"owner123\",\n    \"role\": \"owner\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/auth/signup",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "auth", "signup"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Login Owner User",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.collectionVariables.set('owner_token', jsonData.token);",
+                                    "    pm.collectionVariables.set('owner_id', jsonData._id);",
+                                    "    pm.environment.set('owner_token', jsonData.token);",
+                                    "    pm.environment.set('owner_id', jsonData._id);",
+                                    "    console.log('✓ Owner User logged in:', jsonData._id);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"owner@example.com\",\n    \"password\": \"owner123\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/auth/login",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "auth", "login"]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "2. User Operations (Regular User)",
+            "item": [
+                {
+                    "name": "Get User Profile",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{user1_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/users/{{user1_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "users", "{{user1_id}}"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Follow User",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{user1_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/users/{{user2_id}}/follow",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "users", "{{user2_id}}", "follow"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Unfollow User",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{user1_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/users/{{user2_id}}/unfollow",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "users", "{{user2_id}}", "unfollow"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Block User",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{user1_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/users/{{user2_id}}/block",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "users", "{{user2_id}}", "block"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Unblock User",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{user1_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/users/{{user2_id}}/unblock",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "users", "{{user2_id}}", "unblock"]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "3. Post Operations (Regular User)",
+            "item": [
+                {
+                    "name": "Create Post",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.collectionVariables.set('post_id', jsonData._id);",
+                                    "    pm.environment.set('post_id', jsonData._id);",
+                                    "    console.log('✓ Post created:', jsonData._id);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{user1_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"content\": \"This is a test post from regular user!\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/posts",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "posts"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Like Post",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{user1_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/posts/{{post_id}}/like",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "posts", "{{post_id}}", "like"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Unlike Post",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{user1_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/posts/{{post_id}}/like",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "posts", "{{post_id}}", "like"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Delete Own Post",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{user1_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/posts/{{post_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "posts", "{{post_id}}"]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "4. Activity Feed",
+            "item": [
+                {
+                    "name": "Get Activity Feed (Regular User)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{user1_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/activity",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "activity"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Activity Feed (After Blocking)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{user1_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/activity",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "activity"]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "5. Admin Operations",
+            "item": [
+                {
+                    "name": "Regular User Tries to Delete User (Should Fail)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Regular user cannot delete users\", function () {",
+                                    "    pm.response.to.have.status(403);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{user1_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/users/{{user2_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "admin", "users", "{{user2_id}}"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Admin Deletes User (Should Succeed)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Admin can delete users\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        },
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "exec": [
+                                    "// Create a new target user for deletion",
+                                    "const randomNum = Math.floor(Math.random() * 10000);",
+                                    "const randomEmail = `deleteuser${randomNum}@example.com`;",
+                                    "const randomUsername = `deleteuser${randomNum}`;",
+                                    "",
+                                    "pm.sendRequest({",
+                                    "    url: pm.collectionVariables.get('base_url') + '/api/auth/signup',",
+                                    "    method: 'POST',",
+                                    "    header: {",
+                                    "        'Content-Type': 'application/json'",
+                                    "    },",
+                                    "    body: {",
+                                    "        mode: 'raw',",
+                                    "        raw: JSON.stringify({",
+                                    "            username: randomUsername,",
+                                    "            email: randomEmail,",
+                                    "            password: 'password123',",
+                                    "            role: 'user'",
+                                    "        })",
+                                    "    }",
+                                    "}, function (err, res) {",
+                                    "    if (!err && res.code === 201) {",
+                                    "        const userId = res.json()._id;",
+                                    "        pm.collectionVariables.set('delete_user_id', userId);",
+                                    "        pm.environment.set('delete_user_id', userId);",
+                                    "        console.log('✓ Created user for deletion test:', userId);",
+                                    "    }",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{admin_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/users/{{delete_user_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "admin", "users", "{{delete_user_id}}"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Admin Tries to Delete Owner (Should Fail)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Admin cannot delete owner\", function () {",
+                                    "    pm.response.to.have.status(403);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{admin_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/users/{{owner_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "admin", "users", "{{owner_id}}"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Regular User Tries to Update Role (Should Fail)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Regular user cannot update roles\", function () {",
+                                    "    pm.response.to.have.status(403);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{user1_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"role\": \"admin\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/users/{{user2_id}}/role",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "admin", "users", "{{user2_id}}", "role"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Admin Tries to Update Role (Should Fail)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Admin cannot update roles (only owner can)\", function () {",
+                                    "    pm.response.to.have.status(403);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{admin_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"role\": \"admin\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/users/{{user1_id}}/role",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "admin", "users", "{{user1_id}}", "role"]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "6. Owner Operations",
+            "item": [
+                {
+                    "name": "Owner Updates User Role (Should Succeed)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Owner can update roles\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{owner_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"role\": \"admin\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/users/{{user1_id}}/role",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "admin", "users", "{{user1_id}}", "role"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Owner Demotes User from Admin to User",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Owner can demote users\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{owner_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"role\": \"user\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/users/{{user1_id}}/role",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "admin", "users", "{{user1_id}}", "role"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Owner Deletes User (Should Succeed)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Owner can delete users\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        },
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "exec": [
+                                    "// Create a new target user for deletion by owner",
+                                    "const randomNum = Math.floor(Math.random() * 10000);",
+                                    "const randomEmail = `ownerdeleteuser${randomNum}@example.com`;",
+                                    "const randomUsername = `ownerdeleteuser${randomNum}`;",
+                                    "",
+                                    "pm.sendRequest({",
+                                    "    url: pm.collectionVariables.get('base_url') + '/api/auth/signup',",
+                                    "    method: 'POST',",
+                                    "    header: {",
+                                    "        'Content-Type': 'application/json'",
+                                    "    },",
+                                    "    body: {",
+                                    "        mode: 'raw',",
+                                    "        raw: JSON.stringify({",
+                                    "            username: randomUsername,",
+                                    "            email: randomEmail,",
+                                    "            password: 'password123',",
+                                    "            role: 'user'",
+                                    "        })",
+                                    "    }",
+                                    "}, function (err, res) {",
+                                    "    if (!err && res.code === 201) {",
+                                    "        const userId = res.json()._id;",
+                                    "        pm.collectionVariables.set('owner_delete_user_id', userId);",
+                                    "        pm.environment.set('owner_delete_user_id', userId);",
+                                    "        console.log('✓ Created user for owner deletion test:', userId);",
+                                    "    }",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{owner_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/users/{{owner_delete_user_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "admin", "users", "{{owner_delete_user_id}}"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Owner Deletes Admin (Should Succeed)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Owner can delete admin users\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{owner_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/users/{{admin_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "admin", "users", "{{admin_id}}"]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        }
+    ],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "https://social-activity-feed-backend-production.up.railway.app",
+            "type": "string"
+        },
+        {
+            "key": "user1_token",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "user1_id",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "user2_id",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "admin_token",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "admin_id",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "owner_token",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "owner_id",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "post_id",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "delete_user_id",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "owner_delete_user_id",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "random_email",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "random_username",
+            "value": "",
+            "type": "string"
+        }
+    ]
+}
